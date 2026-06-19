@@ -100,10 +100,8 @@ function Section({
               >
                 <div className="flex h-16 w-16 flex-shrink-0 flex-col items-center justify-center rounded-lg bg-secondary text-secondary-foreground">
                   <span className="text-xs font-semibold uppercase">{f.day}</span>
-                  <span className="text-lg font-semibold leading-tight">
-                    {f.date.split(" ")[1]}
-                  </span>
-                  <span className="text-[10px] uppercase">{f.date.split(" ")[0]}</span>
+                  <span className="text-lg font-semibold leading-tight">{f.dateVal}</span>
+                  <span className="text-[10px] uppercase">{f.monthVal}</span>
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">

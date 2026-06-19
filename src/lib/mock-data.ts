@@ -65,19 +65,40 @@ export const appointments: Appointment[] = [
 ];
 
 export function formatDate(iso: string) {
-  const d = new Date(iso);
-  return {
-    day: d.toLocaleDateString(undefined, { weekday: "short" }),
-    date: d.toLocaleDateString(undefined, { month: "short", day: "numeric" }),
-    time: d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" }),
-    full: d.toLocaleString(undefined, {
-      weekday: "long",
-      month: "long",
-      day: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-    }),
-  };
+  try {
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) {
+      return {
+        day: "",
+        dateVal: "",
+        monthVal: "",
+        time: "",
+        full: "",
+      };
+    }
+    return {
+      day: d.toLocaleDateString("en-US", { weekday: "short" }),
+      dateVal: d.toLocaleDateString("en-US", { day: "numeric" }),
+      monthVal: d.toLocaleDateString("en-US", { month: "short" }),
+      time: d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }),
+      full: d.toLocaleString("en-US", {
+        weekday: "long",
+        month: "long",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+      }),
+    };
+  } catch (error) {
+    console.error("Error formatting date:", error);
+    return {
+      day: "",
+      dateVal: "",
+      monthVal: "",
+      time: "",
+      full: "",
+    };
+  }
 }
 
 export const statusStyles: Record<Status, string> = {
