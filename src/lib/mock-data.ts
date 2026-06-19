@@ -94,7 +94,13 @@ export function getSavedAppointments(userId: string): Appointment[] {
     if (!stored) return [];
     const parsed = JSON.parse(stored);
     if (Array.isArray(parsed)) {
-      return parsed;
+      return parsed.filter(
+        (item: any) =>
+          item &&
+          typeof item === "object" &&
+          typeof item.id === "string" &&
+          item.id.trim() !== "",
+      );
     }
   } catch (err) {
     console.error("Failed to load appointments from localStorage", err);

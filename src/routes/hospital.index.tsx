@@ -4,11 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import {
-  emergencyAlerts,
-  hospitalPatients,
-  statusColor,
-} from "@/lib/hospital-data";
+import { emergencyAlerts, hospitalPatients, statusColor } from "@/lib/hospital-data";
 
 export const Route = createFileRoute("/hospital/")({
   head: () => ({ meta: [{ title: "Hospital Dashboard — MediRemind" }] }),
@@ -95,15 +91,10 @@ function HospitalDashboard() {
               <p className="text-sm text-muted-foreground">No active alerts.</p>
             )}
             {emergencyAlerts.map((a) => (
-              <div
-                key={a.id}
-                className="rounded-lg border border-emergency/30 bg-emergency/5 p-3"
-              >
+              <div key={a.id} className="rounded-lg border border-emergency/30 bg-emergency/5 p-3">
                 <p className="text-sm font-semibold">{a.patientName}</p>
                 <p className="text-xs text-muted-foreground">{a.reportType}</p>
-                <p className="mt-1 text-xs">
-                  Triggered {new Date(a.triggeredAt).toLocaleString()}
-                </p>
+                <p className="mt-1 text-xs">Triggered {new Date(a.triggeredAt).toLocaleString()}</p>
               </div>
             ))}
             <Button asChild variant="outline" className="h-11 w-full">

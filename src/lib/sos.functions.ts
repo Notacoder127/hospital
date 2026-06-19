@@ -53,7 +53,9 @@ export const findNearbyHospitals = createServerFn({ method: "POST" })
           );
           return { hospitals };
         } else {
-          console.warn(`Google Places API returned status: ${json.status}. Falling back to OpenStreetMap.`);
+          console.warn(
+            `Google Places API returned status: ${json.status}. Falling back to OpenStreetMap.`,
+          );
         }
       } catch (err) {
         console.error("Google Places API error, falling back to OpenStreetMap:", err);
@@ -89,14 +91,16 @@ export const findNearbyHospitals = createServerFn({ method: "POST" })
 
       const hospitals = elements.slice(0, 8).map((el: any) => {
         const tags = el.tags ?? {};
-        const name = tags.name || (tags.amenity === "clinic" ? "Specialist Clinic" : "Specialist Hospital");
+        const name =
+          tags.name || (tags.amenity === "clinic" ? "Specialist Clinic" : "Specialist Hospital");
         const latVal = el.lat ?? el.center?.lat ?? data.lat;
         const lngVal = el.lon ?? el.center?.lon ?? data.lng;
         const phone = tags.phone ?? tags["contact:phone"] ?? undefined;
         const street = tags["addr:street"] ?? "";
         const suburb = tags["addr:suburb"] ?? "";
         const city = tags["addr:city"] ?? "";
-        const vicinity = [street, suburb, city].filter(Boolean).join(", ") || tags["addr:full"] || "Nearby Area";
+        const vicinity =
+          [street, suburb, city].filter(Boolean).join(", ") || tags["addr:full"] || "Nearby Area";
 
         return {
           placeId: String(el.id),
@@ -118,12 +122,7 @@ export const findNearbyHospitals = createServerFn({ method: "POST" })
 
 export const sendSosSms = createServerFn({ method: "POST" })
   .inputValidator(
-    (data: {
-      patientName: string;
-      contactPhone: string;
-      lat: number;
-      lng: number;
-    }) => data,
+    (data: { patientName: string; contactPhone: string; lat: number; lng: number }) => data,
   )
   .handler(async ({ data }) => {
     const sid = process.env.TWILIO_ACCOUNT_SID;
@@ -146,17 +145,14 @@ export const sendSosSms = createServerFn({ method: "POST" })
       From: from,
       Body: body,
     });
-    const res = await fetch(
-      `https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Basic ${Buffer.from(`${sid}:${token}`).toString("base64")}`,
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: params.toString(),
+    const res = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`, {
+      method: "POST",
+      headers: {
+        Authorization: `Basic ${Buffer.from(`${sid}:${token}`).toString("base64")}`,
+        "Content-Type": "application/x-www-form-urlencoded",
       },
-    );
+      body: params.toString(),
+    });
     if (!res.ok) {
       const txt = await res.text();
       throw new Error(`Twilio: ${res.status} ${txt}`);

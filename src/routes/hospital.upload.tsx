@@ -131,8 +131,8 @@ function UploadReport() {
               </Select>
               {status === "Critical" && (
                 <p className="rounded-lg border border-emergency/30 bg-emergency/5 p-3 text-sm text-emergency">
-                  Marking this report as Critical will immediately notify the patient,
-                  their emergency contact, and open the emergency escalation panel.
+                  Marking this report as Critical will immediately notify the patient, their
+                  emergency contact, and open the emergency escalation panel.
                 </p>
               )}
             </div>

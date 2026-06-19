@@ -88,7 +88,12 @@ function NewAppointment() {
               }}
             >
               <Field label="Title" id="title">
-                <Input id="title" required placeholder="e.g. Cardiology check-up" className="h-12" />
+                <Input
+                  id="title"
+                  required
+                  placeholder="e.g. Cardiology check-up"
+                  className="h-12"
+                />
               </Field>
               <div className="grid gap-5 sm:grid-cols-2">
                 <Field label="Date" id="date">
@@ -99,7 +104,12 @@ function NewAppointment() {
                 </Field>
               </div>
               <Field label="Location" id="location">
-                <Input id="location" required placeholder="Clinic name & address" className="h-12" />
+                <Input
+                  id="location"
+                  required
+                  placeholder="Clinic name & address"
+                  className="h-12"
+                />
               </Field>
               <Field label="Type" id="type">
                 <Input id="type" placeholder="Check-up, Specialist, Lab…" className="h-12" />
@@ -155,15 +165,7 @@ function NewAppointment() {
   );
 }
 
-function Field({
-  label,
-  id,
-  children,
-}: {
-  label: string;
-  id: string;
-  children: React.ReactNode;
-}) {
+function Field({ label, id, children }: { label: string; id: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1.5">
       <Label htmlFor={id} className="text-sm font-medium">

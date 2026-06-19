@@ -6,7 +6,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { AppHeader } from "@/components/app-header";
-import { appointments, formatDate, statusStyles, type Appointment, getSavedAppointments, saveAppointments } from "@/lib/mock-data";
+import {
+  appointments,
+  formatDate,
+  statusStyles,
+  type Appointment,
+  getSavedAppointments,
+  saveAppointments,
+} from "@/lib/mock-data";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth-store";
 import { supabase } from "@/integrations/supabase/client";
@@ -67,7 +74,9 @@ function ErrorView() {
       <AppHeader />
       <div className="mx-auto max-w-2xl px-4 py-16 text-center">
         <h1 className="text-2xl font-semibold">Something went wrong</h1>
-        <Button className="mt-4" onClick={() => router.invalidate()}>Retry</Button>
+        <Button className="mt-4" onClick={() => router.invalidate()}>
+          Retry
+        </Button>
       </div>
     </div>
   );
@@ -187,10 +196,7 @@ function AppointmentDetail() {
                   key={doc}
                   className="flex items-center gap-3 rounded-lg border border-border/60 bg-muted/40 p-3"
                 >
-                  <input
-                    type="checkbox"
-                    className="h-5 w-5 rounded border-border accent-primary"
-                  />
+                  <input type="checkbox" className="h-5 w-5 rounded border-border accent-primary" />
                   <span className="text-base">{doc}</span>
                 </li>
               ))}

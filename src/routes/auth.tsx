@@ -76,11 +76,15 @@ function AuthPage() {
       }
       const gmailUsernameRegex = /^[a-z0-9.]+$/;
       if (!gmailUsernameRegex.test(username)) {
-        toast.error("Gmail usernames can only contain letters (a-z), numbers (0-9), and periods (.).");
+        toast.error(
+          "Gmail usernames can only contain letters (a-z), numbers (0-9), and periods (.).",
+        );
         return;
       }
       if (username.startsWith(".") || username.endsWith(".") || username.includes("..")) {
-        toast.error("Gmail usernames cannot start/end with periods or contain consecutive periods.");
+        toast.error(
+          "Gmail usernames cannot start/end with periods or contain consecutive periods.",
+        );
         return;
       }
     }
@@ -114,7 +118,10 @@ function AuthPage() {
         toast.success("Account created!");
         navigate({ to: role === "hospital" ? "/hospital" : "/" });
       } else {
-        const { data, error } = await supabase.auth.signInWithPassword({ email: cleanEmail, password });
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: cleanEmail,
+          password,
+        });
         if (error) throw error;
         // Fetch role to route
         const { data: roleRow } = await supabase

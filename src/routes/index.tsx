@@ -39,8 +39,7 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "Dashboard — MediRemind" },
       {
         property: "og:description",
-        content:
-          "Stay on top of appointments and reach help fast with Emergency SOS.",
+        content: "Stay on top of appointments and reach help fast with Emergency SOS.",
       },
     ],
   }),
@@ -75,7 +74,7 @@ function Dashboard() {
       const userId = auth.user?.id || "anonymous";
       const local = getSavedAppointments(userId);
       const filteredMocks = appointments.filter(
-        (mock) => !local.some((l: any) => l.id === mock.id)
+        (mock) => !local.some((l: any) => l.id === mock.id),
       );
       setAllAppointments([...local, ...filteredMocks]);
     }
@@ -173,7 +172,12 @@ function AppointmentRow({ appt, muted }: { appt: Appointment; muted?: boolean })
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
           <h3 className="truncate text-base font-semibold sm:text-lg">{appt.title}</h3>
-          <Badge className={cn("rounded-full px-2.5 py-0.5 text-xs font-medium", statusStyles[appt.status])}>
+          <Badge
+            className={cn(
+              "rounded-full px-2.5 py-0.5 text-xs font-medium",
+              statusStyles[appt.status],
+            )}
+          >
             {appt.status}
           </Badge>
         </div>
@@ -293,9 +297,7 @@ function EmergencyCard() {
             Emergency
           </span>
         </div>
-        <h2 className="font-display text-2xl font-semibold leading-tight">
-          Need help right now?
-        </h2>
+        <h2 className="font-display text-2xl font-semibold leading-tight">Need help right now?</h2>
         <p className="mt-1 text-sm opacity-90">
           Share your location with {contactName} and find nearby hospitals.
         </p>

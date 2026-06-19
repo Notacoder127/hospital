@@ -1,6 +1,14 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Building2, CalendarPlus, HeartPulse, LayoutDashboard, LogOut, Siren, User } from "lucide-react";
+import {
+  Building2,
+  CalendarPlus,
+  HeartPulse,
+  LayoutDashboard,
+  LogOut,
+  Siren,
+  User,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -16,7 +24,6 @@ import {
 import { patient } from "@/lib/mock-data";
 import { signOut, setRoleOverride, useAuth } from "@/lib/auth-store";
 import { useProfile } from "@/lib/profile-store";
-
 
 const nav = [
   { label: "Dashboard", to: "/", icon: LayoutDashboard },
@@ -105,7 +112,10 @@ export function AppHeader() {
           ))}
           <EmergencyDialog
             trigger={
-              <Button size="icon" className="h-11 w-11 bg-emergency text-emergency-foreground hover:bg-emergency/90">
+              <Button
+                size="icon"
+                className="h-11 w-11 bg-emergency text-emergency-foreground hover:bg-emergency/90"
+              >
                 <Siren className="h-5 w-5" />
                 <span className="sr-only">Emergency SOS</span>
               </Button>
@@ -135,8 +145,8 @@ export function EmergencyDialog({ trigger }: { trigger: React.ReactNode }) {
           </AlertDialogTitle>
           <AlertDialogDescription>
             We'll share your current location with{" "}
-            <span className="font-medium text-foreground">{contactName}</span>{" "}
-            via SMS and show the nearest hospitals.
+            <span className="font-medium text-foreground">{contactName}</span> via SMS and show the
+            nearest hospitals.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

@@ -1,14 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import {
-  ArrowLeft,
-  Loader2,
-  MapPin,
-  Navigation,
-  Phone,
-  Siren,
-} from "lucide-react";
+import { ArrowLeft, Loader2, MapPin, Navigation, Phone, Siren } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,11 +9,7 @@ import { AppHeader } from "@/components/app-header";
 import { useAuth } from "@/lib/auth-store";
 import { useProfile } from "@/lib/profile-store";
 import { patient } from "@/lib/mock-data";
-import {
-  findNearbyHospitals,
-  sendSosSms,
-  type NearbyHospital,
-} from "@/lib/sos.functions";
+import { findNearbyHospitals, sendSosSms, type NearbyHospital } from "@/lib/sos.functions";
 
 export const Route = createFileRoute("/sos")({
   head: () => ({
@@ -93,8 +82,7 @@ function SosPage() {
     if (auth.loading || !coords || smsSent) return;
     if (auth.user && profile === undefined) return; // wait for profile to load
 
-    const contactPhone =
-      profile?.emergency_contact_phone || patient.emergencyContact.phone;
+    const contactPhone = profile?.emergency_contact_phone || patient.emergencyContact.phone;
     const patientName = profile?.full_name || patient.name;
     if (!contactPhone) return;
     setSmsSent(true);
@@ -127,15 +115,17 @@ function SosPage() {
       address: profile?.address || patient.address,
       nearestHospital: {
         name: nearestHosp?.name || "Nearest Hospital",
-        distanceKm: nearestHosp ? Number(haversineKm(coords.lat, coords.lng, nearestHosp.lat, nearestHosp.lng).toFixed(2)) : 1.2,
-        mapsUrl: nearestHosp 
+        distanceKm: nearestHosp
+          ? Number(haversineKm(coords.lat, coords.lng, nearestHosp.lat, nearestHosp.lng).toFixed(2))
+          : 1.2,
+        mapsUrl: nearestHosp
           ? `https://www.google.com/maps/dir/?api=1&destination=${nearestHosp.lat},${nearestHosp.lng}`
           : "https://www.google.com/maps",
       },
       log: [
         { timestamp: new Date().toISOString(), message: "SOS activated by patient" },
         { timestamp: new Date().toISOString(), message: "Emergency contact notified via SMS" },
-      ]
+      ],
     };
 
     if (typeof window !== "undefined") {
@@ -143,7 +133,7 @@ function SosPage() {
       const list = stored ? JSON.parse(stored) : [];
       list.unshift(newAlert);
       localStorage.setItem("mediremind_active_alerts", JSON.stringify(list));
-      
+
       try {
         const bc = new BroadcastChannel("mediremind_sos_channel");
         bc.postMessage({ type: "SOS_ALERT", alert: newAlert });
@@ -188,9 +178,7 @@ function SosPage() {
         {status === "denied" && (
           <Card className="border-emergency/40 bg-emergency/5">
             <CardContent className="space-y-3 py-6">
-              <p className="text-base font-semibold text-emergency">
-                Location access denied
-              </p>
+              <p className="text-base font-semibold text-emergency">Location access denied</p>
               <p className="text-sm text-muted-foreground">
                 Please enable location in your browser settings, or call 108 directly.
               </p>
@@ -267,12 +255,7 @@ function HospitalCard({
           </span>
         </div>
         <div className="grid gap-2 sm:grid-cols-2">
-          <Button
-            asChild
-            variant="outline"
-            className="h-11"
-            disabled={!hospital.phone}
-          >
+          <Button asChild variant="outline" className="h-11" disabled={!hospital.phone}>
             {hospital.phone ? (
               <a href={`tel:${hospital.phone}`}>
                 <Phone className="mr-2 h-4 w-4" /> Call

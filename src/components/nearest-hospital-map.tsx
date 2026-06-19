@@ -33,10 +33,7 @@ export function NearestHospitalMap({
       )}`;
 
   return (
-    <div
-      className="overflow-hidden rounded-lg border border-border"
-      style={{ height }}
-    >
+    <div className="overflow-hidden rounded-lg border border-border" style={{ height }}>
       <iframe
         title={`Map to ${hospitalName ?? "nearest hospital"}`}
         src={src}

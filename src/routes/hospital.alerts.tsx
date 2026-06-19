@@ -19,7 +19,8 @@ function AlertsPage() {
   useEffect(() => {
     // Load initial alerts (mock data + local storage active alerts)
     const loadAlerts = () => {
-      const stored = typeof window !== "undefined" ? localStorage.getItem("mediremind_active_alerts") : null;
+      const stored =
+        typeof window !== "undefined" ? localStorage.getItem("mediremind_active_alerts") : null;
       const localAlerts = stored ? JSON.parse(stored) : [];
       setAlerts([...localAlerts, ...emergencyAlerts]);
     };
@@ -127,8 +128,9 @@ function AlertsPage() {
                         </p>
                         <p className="inline-flex items-center gap-2">
                           <Phone className="h-4 w-4 text-muted-foreground" />
-                          Emergency contact: {patient 
-                            ? `${patient.emergencyContact.name} · ${patient.emergencyContact.phone}` 
+                          Emergency contact:{" "}
+                          {patient
+                            ? `${patient.emergencyContact.name} · ${patient.emergencyContact.phone}`
                             : `${a.emergencyContact?.name || "N/A"} · ${a.emergencyContact?.phone || "N/A"}`}
                         </p>
                       </div>

@@ -67,6 +67,18 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
           >
             Go home
           </a>
+          <button
+            onClick={() => {
+              if (typeof window !== "undefined") {
+                localStorage.clear();
+                sessionStorage.clear();
+                window.location.href = "/";
+              }
+            }}
+            className="inline-flex items-center justify-center rounded-md border border-destructive/30 bg-destructive/10 px-4 py-2 text-sm font-medium text-destructive transition-colors hover:bg-destructive/20"
+          >
+            Reset App Data
+          </button>
         </div>
       </div>
     </div>
@@ -79,22 +91,45 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "MediRemind — Health Appointments & Emergency Reminders" },
-      { name: "description", content: "Never miss a health appointment. MediRemind sends SMS & call reminders and includes a one-tap Emergency SOS." },
+      {
+        name: "description",
+        content:
+          "Never miss a health appointment. MediRemind sends SMS & call reminders and includes a one-tap Emergency SOS.",
+      },
       { name: "author", content: "MediRemind" },
       { property: "og:title", content: "MediRemind — Health Appointments & Emergency Reminders" },
-      { property: "og:description", content: "Never miss a health appointment. MediRemind sends SMS & call reminders and includes a one-tap Emergency SOS." },
+      {
+        property: "og:description",
+        content:
+          "Never miss a health appointment. MediRemind sends SMS & call reminders and includes a one-tap Emergency SOS.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:title", content: "MediRemind — Health Appointments & Emergency Reminders" },
-      { name: "twitter:description", content: "Never miss a health appointment. MediRemind sends SMS & call reminders and includes a one-tap Emergency SOS." },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/01311d87-2869-43aa-9c36-1537be6fe70c" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/01311d87-2869-43aa-9c36-1537be6fe70c" },
+      {
+        name: "twitter:description",
+        content:
+          "Never miss a health appointment. MediRemind sends SMS & call reminders and includes a one-tap Emergency SOS.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/01311d87-2869-43aa-9c36-1537be6fe70c",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/01311d87-2869-43aa-9c36-1537be6fe70c",
+      },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap",
+      },
     ],
   }),
   shellComponent: RootShell,

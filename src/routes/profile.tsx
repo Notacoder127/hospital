@@ -131,7 +131,8 @@ function ProfilePage() {
     setEcPhoneCode(parsedEcPhone.code);
   }, [profile]);
 
-  const update = <K extends keyof FormState>(key: K) =>
+  const update =
+    <K extends keyof FormState>(key: K) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
       setForm((f) => ({ ...f, [key]: e.target.value }));
 
@@ -141,7 +142,9 @@ function ProfilePage() {
     setSaving(true);
 
     const finalPhone = form.phone ? `${phoneCode}${form.phone.trim()}` : "";
-    const finalEcPhone = form.emergency_contact_phone ? `${ecPhoneCode}${form.emergency_contact_phone.trim()}` : "";
+    const finalEcPhone = form.emergency_contact_phone
+      ? `${ecPhoneCode}${form.emergency_contact_phone.trim()}`
+      : "";
 
     const { error } = await supabase
       .from("profiles")
@@ -188,7 +191,12 @@ function ProfilePage() {
               </CardHeader>
               <CardContent className="space-y-5">
                 <Field label="Full name" id="name">
-                  <Input id="name" value={form.full_name} onChange={update("full_name")} className="h-12" />
+                  <Input
+                    id="name"
+                    value={form.full_name}
+                    onChange={update("full_name")}
+                    className="h-12"
+                  />
                 </Field>
                 <Field label="Phone number" id="phone">
                   <div className="flex gap-2">
@@ -216,7 +224,12 @@ function ProfilePage() {
                   </div>
                 </Field>
                 <Field label="Address" id="address">
-                  <Textarea id="address" value={form.address} onChange={update("address")} rows={3} />
+                  <Textarea
+                    id="address"
+                    value={form.address}
+                    onChange={update("address")}
+                    rows={3}
+                  />
                 </Field>
                 <Field label="Blood group" id="blood">
                   <Input
@@ -295,15 +308,7 @@ function ProfilePage() {
   );
 }
 
-function Field({
-  label,
-  id,
-  children,
-}: {
-  label: string;
-  id: string;
-  children: React.ReactNode;
-}) {
+function Field({ label, id, children }: { label: string; id: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1.5">
       <Label htmlFor={id} className="text-sm font-medium">
