@@ -34,11 +34,45 @@ function AuthPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (submitting) return;
+
+    const cleanEmail = email.trim().toLowerCase();
+
+    // 1. General email validation
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(cleanEmail)) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+
+    // 2. Gmail specific validation
+    if (cleanEmail.endsWith("@gmail.com")) {
+      const username = cleanEmail.split("@")[0];
+      if (username.length < 6 || username.length > 30) {
+        toast.error("Gmail username must be between 6 and 30 characters.");
+        return;
+      }
+      const gmailUsernameRegex = /^[a-z0-9.]+$/;
+      if (!gmailUsernameRegex.test(username)) {
+        toast.error("Gmail usernames can only contain letters (a-z), numbers (0-9), and periods (.).");
+        return;
+      }
+      if (username.startsWith(".") || username.endsWith(".") || username.includes("..")) {
+        toast.error("Gmail usernames cannot start/end with periods or contain consecutive periods.");
+        return;
+      }
+    }
+
+    // 3. Password validation
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters.");
+      return;
+    }
+
     setSubmitting(true);
     try {
       if (mode === "signup") {
         const { data, error } = await supabase.auth.signUp({
-          email,
+          email: cleanEmail,
           password,
           options: {
             emailRedirectTo: `${window.location.origin}/`,
@@ -57,7 +91,7 @@ function AuthPage() {
         toast.success("Account created!");
         navigate({ to: role === "hospital" ? "/hospital" : "/" });
       } else {
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        const { data, error } = await supabase.auth.signInWithPassword({ email: cleanEmail, password });
         if (error) throw error;
         // Fetch role to route
         const { data: roleRow } = await supabase
