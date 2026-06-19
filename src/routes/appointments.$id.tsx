@@ -73,6 +73,7 @@ function ErrorView() {
 function AppointmentDetail() {
   const { appt: loaderAppt } = Route.useLoaderData() as { appt: Appointment | null };
   const [localAppt, setLocalAppt] = useState<Appointment | null>(loaderAppt);
+  const [notFoundState, setNotFoundState] = useState(false);
   const params = Route.useParams();
   const auth = useAuth();
 
@@ -86,11 +87,14 @@ function AppointmentDetail() {
       if (found) {
         setLocalAppt(found);
       } else {
-        // Force notFound if truly not found on client mount
-        throw notFound();
+        setNotFoundState(true);
       }
     }
   }, [localAppt, params.id, auth.user?.id, auth.loading]);
+
+  if (notFoundState) {
+    return <NotFound />;
+  }
 
   if (!localAppt) {
     return (
