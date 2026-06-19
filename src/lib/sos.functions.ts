@@ -134,11 +134,17 @@ export const sendSosSms = createServerFn({ method: "POST" })
     if (!sid || !token || !from) {
       throw new Error("Twilio credentials not configured");
     }
+
+    let toPhone = data.contactPhone.trim();
+    if (!toPhone.startsWith("+")) {
+      toPhone = "+" + toPhone;
+    }
+
     const mapsLink = `https://maps.google.com/?q=${data.lat},${data.lng}`;
     const body = `${data.patientName} has triggered an emergency alert. Current location: ${mapsLink}. Please help them reach the nearest hospital immediately.`;
 
     const params = new URLSearchParams({
-      To: data.contactPhone,
+      To: toPhone,
       From: from,
       Body: body,
     });
@@ -147,7 +153,7 @@ export const sendSosSms = createServerFn({ method: "POST" })
       {
         method: "POST",
         headers: {
-          Authorization: `Basic ${btoa(`${sid}:${token}`)}`,
+          Authorization: `Basic ${Buffer.from(`${sid}:${token}`).toString("base64")}`,
           "Content-Type": "application/x-www-form-urlencoded",
         },
         body: params.toString(),
