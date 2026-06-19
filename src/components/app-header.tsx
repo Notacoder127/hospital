@@ -14,7 +14,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { patient } from "@/lib/mock-data";
-import { signOut, setRoleOverride } from "@/lib/auth-store";
+import { signOut, setRoleOverride, useAuth } from "@/lib/auth-store";
+import { useProfile } from "@/lib/profile-store";
 
 
 const nav = [
@@ -119,6 +120,10 @@ export function AppHeader() {
 export function EmergencyDialog({ trigger }: { trigger: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+  const auth = useAuth();
+  const { data: profile } = useProfile(auth.user?.id);
+  const contactName = profile?.emergency_contact_name?.trim() || patient.emergencyContact.name;
+
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
@@ -130,7 +135,7 @@ export function EmergencyDialog({ trigger }: { trigger: React.ReactNode }) {
           </AlertDialogTitle>
           <AlertDialogDescription>
             We'll share your current location with{" "}
-            <span className="font-medium text-foreground">{patient.emergencyContact.name}</span>{" "}
+            <span className="font-medium text-foreground">{contactName}</span>{" "}
             via SMS and show the nearest hospitals.
           </AlertDialogDescription>
         </AlertDialogHeader>

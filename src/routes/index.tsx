@@ -230,6 +230,9 @@ function ProfileCard() {
 }
 
 function EmergencyCard() {
+  const auth = useAuth();
+  const { data: profile } = useProfile(auth.user?.id);
+  const contactName = profile?.emergency_contact_name?.trim() || patient.emergencyContact.name;
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
 
   useEffect(() => {
@@ -248,7 +251,7 @@ function EmergencyCard() {
 
   const queryStr = coords
     ? `specialist hospital diagnostic near ${coords.lat},${coords.lng}`
-    : `hospital diagnostic near ${patient.address}`;
+    : `hospital diagnostic near ${profile?.address || patient.address}`;
 
   const mapsSearchUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
     queryStr,
@@ -269,7 +272,7 @@ function EmergencyCard() {
           Need help right now?
         </h2>
         <p className="mt-1 text-sm opacity-90">
-          Share your location with {patient.emergencyContact.name} and find nearby hospitals.
+          Share your location with {contactName} and find nearby hospitals.
         </p>
         <EmergencyDialog
           trigger={

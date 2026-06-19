@@ -90,7 +90,9 @@ function SosPage() {
   }, [coords, findFn]);
 
   useEffect(() => {
-    if (!coords || smsSent) return;
+    if (auth.loading || !coords || smsSent) return;
+    if (auth.user && profile === undefined) return; // wait for profile to load
+
     const contactPhone =
       profile?.emergency_contact_phone || patient.emergencyContact.phone;
     const patientName = profile?.full_name || patient.name;
@@ -102,10 +104,11 @@ function SosPage() {
         setSmsSent(false);
         toast.error(`SMS failed: ${e.message}`);
       });
-  }, [coords, profile, smsFn, smsSent]);
+  }, [coords, profile, smsFn, smsSent, auth.loading, auth.user]);
 
   useEffect(() => {
-    if (!coords || loadingHospitals || alertSaved) return;
+    if (auth.loading || !coords || loadingHospitals || alertSaved) return;
+    if (auth.user && profile === undefined) return; // wait for profile to load
     setAlertSaved(true);
 
     const nearestHosp = hospitals[0];
@@ -149,7 +152,7 @@ function SosPage() {
         console.error("BroadcastChannel error", e);
       }
     }
-  }, [coords, hospitals, loadingHospitals, alertSaved, profile, auth.user]);
+  }, [coords, hospitals, loadingHospitals, alertSaved, profile, auth.loading, auth.user]);
 
   return (
     <div className="min-h-screen bg-background">
