@@ -1,11 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
 import { CalendarPlus, ChevronRight, Clock, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { AppHeader } from "@/components/app-header";
-import { appointments, formatDate, statusStyles } from "@/lib/mock-data";
+import { appointments, formatDate, statusStyles, type Appointment } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/appointments/")({
   head: () => ({
@@ -18,8 +19,18 @@ export const Route = createFileRoute("/appointments/")({
 });
 
 function AppointmentsPage() {
-  const upcoming = appointments.filter((a) => a.status !== "Completed");
-  const past = appointments.filter((a) => a.status === "Completed");
+  const [allAppointments, setAllAppointments] = useState<Appointment[]>(appointments);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("mediremind_appointments");
+      const local = stored ? JSON.parse(stored) : [];
+      setAllAppointments([...local, ...appointments]);
+    }
+  }, []);
+
+  const upcoming = allAppointments.filter((a) => a.status !== "Completed");
+  const past = allAppointments.filter((a) => a.status === "Completed");
 
   return (
     <div className="min-h-screen bg-background">

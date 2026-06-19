@@ -52,6 +52,31 @@ function NewAppointment() {
               className="space-y-5"
               onSubmit={(e) => {
                 e.preventDefault();
+                const formEl = e.currentTarget;
+                const titleInput = formEl.elements.namedItem("title") as HTMLInputElement;
+                const dateInput = formEl.elements.namedItem("date") as HTMLInputElement;
+                const timeInput = formEl.elements.namedItem("time") as HTMLInputElement;
+                const locationInput = formEl.elements.namedItem("location") as HTMLInputElement;
+                const typeInput = formEl.elements.namedItem("type") as HTMLInputElement;
+
+                const newAppt = {
+                  id: `appt-${Date.now()}`,
+                  title: titleInput.value,
+                  doctor: typeInput.value || "General Practitioner",
+                  date: `${dateInput.value}T${timeInput.value}:00`,
+                  location: locationInput.value,
+                  status: "Upcoming" as const,
+                  type: typeInput.value || "Check-up",
+                  documents: docs,
+                };
+
+                if (typeof window !== "undefined") {
+                  const stored = localStorage.getItem("mediremind_appointments");
+                  const list = stored ? JSON.parse(stored) : [];
+                  list.unshift(newAppt);
+                  localStorage.setItem("mediremind_appointments", JSON.stringify(list));
+                }
+
                 toast.success("Appointment saved", {
                   description: "We'll send SMS & call reminders before the visit.",
                 });

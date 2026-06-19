@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound, useRouter } from "@tanstack/react-router";
-import { ArrowLeft, Calendar, ClipboardList, MapPin, Stethoscope } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ArrowLeft, Calendar, ClipboardList, Loader2, MapPin, Stethoscope } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,14 +10,24 @@ import { appointments, formatDate, statusStyles, type Appointment } from "@/lib/
 
 export const Route = createFileRoute("/appointments/$id")({
   loader: ({ params }) => {
-    const appt = appointments.find((a) => a.id === params.id);
-    if (!appt) throw notFound();
+    let appt = appointments.find((a) => a.id === params.id);
+    if (!appt && typeof window !== "undefined") {
+      const stored = localStorage.getItem("mediremind_appointments");
+      const list = stored ? JSON.parse(stored) : [];
+      appt = list.find((a: any) => a.id === params.id);
+    }
+    if (!appt) {
+      if (typeof window === "undefined") {
+        return { appt: null };
+      }
+      throw notFound();
+    }
     return { appt };
   },
   head: ({ loaderData }) => ({
     meta: [
-      { title: `${loaderData?.appt.title ?? "Appointment"} — MediRemind` },
-      { name: "description", content: loaderData?.appt.location ?? "" },
+      { title: `${loaderData?.appt?.title ?? "Appointment"} — MediRemind` },
+      { name: "description", content: loaderData?.appt?.location ?? "" },
     ],
   }),
   notFoundComponent: NotFound,
@@ -52,7 +63,37 @@ function ErrorView() {
 }
 
 function AppointmentDetail() {
-  const { appt } = Route.useLoaderData() as { appt: Appointment };
+  const { appt } = Route.useLoaderData() as { appt: Appointment | null };
+  const [localAppt, setLocalAppt] = useState<Appointment | null>(appt);
+  const params = Route.useParams();
+
+  useEffect(() => {
+    if (!localAppt && typeof window !== "undefined") {
+      const stored = localStorage.getItem("mediremind_appointments");
+      const list = stored ? JSON.parse(stored) : [];
+      const found = list.find((a: any) => a.id === params.id);
+      if (found) {
+        setLocalAppt(found);
+      } else {
+        // Force notFound if truly not found on client mount
+        throw notFound();
+      }
+    }
+  }, [localAppt, params.id]);
+
+  if (!localAppt) {
+    return (
+      <div className="min-h-screen bg-background">
+        <AppHeader />
+        <div className="mx-auto max-w-2xl px-4 py-16 text-center flex flex-col items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="mt-2 text-sm text-muted-foreground">Loading appointment details…</p>
+        </div>
+      </div>
+    );
+  }
+
+  const appt = localAppt;
   const f = formatDate(appt.date);
   return (
     <div className="min-h-screen bg-background">

@@ -51,6 +51,7 @@ function Dashboard() {
   const auth = useAuth();
   const { data: profile } = useProfile(auth.user?.id);
   const [greeting, setGreeting] = useState("Good morning");
+  const [allAppointments, setAllAppointments] = useState<Appointment[]>(appointments);
 
   useEffect(() => {
     if (auth.loading) return;
@@ -67,8 +68,16 @@ function Dashboard() {
     }
   }, []);
 
-  const upcoming = appointments.filter((a) => a.status !== "Completed");
-  const past = appointments.filter((a) => a.status === "Completed");
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("mediremind_appointments");
+      const local = stored ? JSON.parse(stored) : [];
+      setAllAppointments([...local, ...appointments]);
+    }
+  }, []);
+
+  const upcoming = allAppointments.filter((a) => a.status !== "Completed");
+  const past = allAppointments.filter((a) => a.status === "Completed");
   const displayName = (profile?.full_name?.trim() || patient.name).split(" ")[0];
 
   return (
