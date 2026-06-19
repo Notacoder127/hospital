@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import { AppHeader, EmergencyDialog } from "@/components/app-header";
 import { useAuth } from "@/lib/auth-store";
 import { useProfile } from "@/lib/profile-store";
+import { LocationPromptModal } from "@/components/location-prompt-modal";
 import {
   appointments,
   formatDate,
@@ -52,6 +53,34 @@ function Dashboard() {
   const { data: profile } = useProfile(auth.user?.id);
   const [greeting, setGreeting] = useState("Good morning");
   const [allAppointments, setAllAppointments] = useState<Appointment[]>(appointments);
+  const [locationData, setLocationData] = useState<{
+    type: "gps" | "manual";
+    coords?: { lat: number; lng: number };
+    address?: string;
+  } | null>(() => {
+    if (typeof window !== "undefined") {
+      const isSet = sessionStorage.getItem("mediremind_location_set") === "true";
+      if (isSet) {
+        const type = sessionStorage.getItem("mediremind_location_type") as "gps" | "manual";
+        let coords: { lat: number; lng: number } | undefined;
+        let address: string | undefined;
+        if (type === "gps") {
+          const stored = sessionStorage.getItem("mediremind_gps_coords");
+          if (stored) {
+            try { coords = JSON.parse(stored); } catch {}
+          }
+        } else if (type === "manual") {
+          address = sessionStorage.getItem("mediremind_manual_address") || undefined;
+          const stored = sessionStorage.getItem("mediremind_gps_coords");
+          if (stored) {
+            try { coords = JSON.parse(stored); } catch {}
+          }
+        }
+        return { type, coords, address };
+      }
+    }
+    return null;
+  });
 
   useEffect(() => {
     if (auth.loading) return;
@@ -87,6 +116,7 @@ function Dashboard() {
   return (
     <div className="min-h-screen bg-background">
       <AppHeader />
+      <LocationPromptModal onLocationSet={(data) => setLocationData(data)} />
       <main className="mx-auto max-w-6xl px-4 pb-20 pt-8 sm:px-6 lg:px-8">
         <section className="mb-8 flex flex-col gap-2">
           <p className="text-sm font-medium text-muted-foreground">Today</p>
@@ -104,7 +134,7 @@ function Dashboard() {
             <PastList items={past} />
           </div>
           <div className="space-y-6">
-            <EmergencyCard />
+            <EmergencyCard locationData={locationData} />
             <ProfileCard />
             <QuickActions />
           </div>
@@ -258,29 +288,24 @@ function ProfileCard() {
   );
 }
 
-function EmergencyCard() {
+function EmergencyCard({
+  locationData,
+}: {
+  locationData: {
+    type: "gps" | "manual";
+    coords?: { lat: number; lng: number };
+    address?: string;
+  } | null;
+}) {
   const auth = useAuth();
   const { data: profile } = useProfile(auth.user?.id);
   const contactName = profile?.emergency_contact_name?.trim() || patient.emergencyContact.name;
-  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
 
-  useEffect(() => {
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-        },
-        () => {
-          // ignore, fallback to patient.address
-        },
-        { enableHighAccuracy: true, timeout: 10000 },
-      );
-    }
-  }, []);
-
-  const queryStr = coords
-    ? `hospital near ${coords.lat},${coords.lng}`
-    : `hospital near ${profile?.address || patient.address}`;
+  const queryStr = locationData?.coords
+    ? `hospital near ${locationData.coords.lat},${locationData.coords.lng}`
+    : locationData?.address
+      ? `hospital near ${locationData.address}`
+      : `hospital near ${profile?.address || patient.address}`;
 
   const mapsSearchUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
     queryStr,

@@ -97,6 +97,7 @@ export function useAuth(): AuthState {
 export async function signOut() {
   if (typeof window !== "undefined") {
     localStorage.removeItem("dev_role_override");
+    sessionStorage.clear();
   }
   await supabase.auth.signOut();
 }

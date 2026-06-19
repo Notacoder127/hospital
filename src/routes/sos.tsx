@@ -47,6 +47,22 @@ function SosPage() {
   }, [auth, navigate]);
 
   useEffect(() => {
+    // Check if session location coords are already saved (e.g. from dashboard prompt)
+    const isSet = sessionStorage.getItem("mediremind_location_set") === "true";
+    if (isSet) {
+      const stored = sessionStorage.getItem("mediremind_gps_coords");
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (parsed && typeof parsed.lat === "number" && typeof parsed.lng === "number") {
+            setCoords(parsed);
+            setStatus("ready");
+            return;
+          }
+        } catch {}
+      }
+    }
+
     if (!("geolocation" in navigator)) {
       setStatus("error");
       setErrorMsg("Geolocation is not supported in this browser.");
@@ -54,8 +70,13 @@ function SosPage() {
     }
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        const c = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        setCoords(c);
         setStatus("ready");
+        // Also save to session so we don't ask again in this session
+        sessionStorage.setItem("mediremind_location_set", "true");
+        sessionStorage.setItem("mediremind_location_type", "gps");
+        sessionStorage.setItem("mediremind_gps_coords", JSON.stringify(c));
       },
       (err) => {
         if (err.code === err.PERMISSION_DENIED) setStatus("denied");
