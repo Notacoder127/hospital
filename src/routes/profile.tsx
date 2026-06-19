@@ -12,6 +12,13 @@ import { useAuth } from "@/lib/auth-store";
 import { profileQueryKey, useProfile } from "@/lib/profile-store";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -40,6 +47,56 @@ const empty: FormState = {
   emergency_contact_relationship: "",
 };
 
+const countries = [
+  { code: "+1", name: "United States / Canada", flag: "🇺🇸" },
+  { code: "+91", name: "India", flag: "🇮🇳" },
+  { code: "+44", name: "United Kingdom", flag: "🇬🇧" },
+  { code: "+61", name: "Australia", flag: "🇦🇺" },
+  { code: "+971", name: "United Arab Emirates", flag: "🇦🇪" },
+  { code: "+65", name: "Singapore", flag: "🇸🇬" },
+  { code: "+49", name: "Germany", flag: "🇩🇪" },
+  { code: "+33", name: "France", flag: "🇫🇷" },
+  { code: "+81", name: "Japan", flag: "🇯🇵" },
+  { code: "+86", name: "China", flag: "🇨🇳" },
+  { code: "+55", name: "Brazil", flag: "🇧🇷" },
+  { code: "+27", name: "South Africa", flag: "🇿🇦" },
+  { code: "+52", name: "Mexico", flag: "🇲🇽" },
+  { code: "+7", name: "Russia", flag: "🇷🇺" },
+  { code: "+39", name: "Italy", flag: "🇮🇹" },
+  { code: "+34", name: "Spain", flag: "🇪🇸" },
+  { code: "+82", name: "South Korea", flag: "🇰🇷" },
+  { code: "+92", name: "Pakistan", flag: "🇵🇰" },
+  { code: "+880", name: "Bangladesh", flag: "🇧🇩" },
+  { code: "+60", name: "Malaysia", flag: "🇲🇾" },
+  { code: "+62", name: "Indonesia", flag: "🇮🇩" },
+  { code: "+63", name: "Philippines", flag: "🇵🇭" },
+  { code: "+64", name: "New Zealand", flag: "🇳🇿" },
+  { code: "+966", name: "Saudi Arabia", flag: "🇸🇦" },
+  { code: "+90", name: "Turkey", flag: "🇹🇷" },
+  { code: "+20", name: "Egypt", flag: "🇪🇬" },
+  { code: "+234", name: "Nigeria", flag: "🇳🇬" },
+  { code: "+54", name: "Argentina", flag: "🇦🇷" },
+];
+
+const parsePhone = (fullPhone: string) => {
+  if (!fullPhone) return { code: "+91", number: "" };
+  // Sort country codes by length of code descending to match longest first (+971 before +9)
+  const sortedCountries = [...countries].sort((a, b) => b.code.length - a.code.length);
+  for (const c of sortedCountries) {
+    if (fullPhone.startsWith(c.code)) {
+      return { code: c.code, number: fullPhone.slice(c.code.length).trim() };
+    }
+  }
+  if (fullPhone.startsWith("+")) {
+    const match = fullPhone.match(/^\+(\d{1,4})/);
+    if (match) {
+      const code = "+" + match[1];
+      return { code, number: fullPhone.slice(code.length).trim() };
+    }
+  }
+  return { code: "+91", number: fullPhone };
+};
+
 function ProfilePage() {
   const navigate = useNavigate();
   const auth = useAuth();
@@ -48,6 +105,8 @@ function ProfilePage() {
 
   const [form, setForm] = useState<FormState>(empty);
   const [saving, setSaving] = useState(false);
+  const [phoneCode, setPhoneCode] = useState("+91");
+  const [ecPhoneCode, setEcPhoneCode] = useState("+91");
 
   useEffect(() => {
     if (!auth.loading && !auth.user) navigate({ to: "/auth" });
@@ -56,15 +115,20 @@ function ProfilePage() {
   // Pre-fill once profile loads
   useEffect(() => {
     if (!profile) return;
+    const parsedPhone = parsePhone(profile.phone ?? "");
+    const parsedEcPhone = parsePhone(profile.emergency_contact_phone ?? "");
+
     setForm({
       full_name: profile.full_name ?? "",
-      phone: profile.phone ?? "",
+      phone: parsedPhone.number,
       address: profile.address ?? "",
       blood_group: profile.blood_group ?? "",
       emergency_contact_name: profile.emergency_contact_name ?? "",
-      emergency_contact_phone: profile.emergency_contact_phone ?? "",
+      emergency_contact_phone: parsedEcPhone.number,
       emergency_contact_relationship: profile.emergency_contact_relationship ?? "",
     });
+    setPhoneCode(parsedPhone.code);
+    setEcPhoneCode(parsedEcPhone.code);
   }, [profile]);
 
   const update = <K extends keyof FormState>(key: K) =>
@@ -75,15 +139,19 @@ function ProfilePage() {
     e.preventDefault();
     if (!auth.user) return;
     setSaving(true);
+
+    const finalPhone = form.phone ? `${phoneCode}${form.phone.trim()}` : "";
+    const finalEcPhone = form.emergency_contact_phone ? `${ecPhoneCode}${form.emergency_contact_phone.trim()}` : "";
+
     const { error } = await supabase
       .from("profiles")
       .update({
         full_name: form.full_name,
-        phone: form.phone,
+        phone: finalPhone,
         address: form.address,
         blood_group: form.blood_group,
         emergency_contact_name: form.emergency_contact_name,
-        emergency_contact_phone: form.emergency_contact_phone,
+        emergency_contact_phone: finalEcPhone,
         emergency_contact_relationship: form.emergency_contact_relationship,
       })
       .eq("id", auth.user.id);
@@ -123,7 +191,29 @@ function ProfilePage() {
                   <Input id="name" value={form.full_name} onChange={update("full_name")} className="h-12" />
                 </Field>
                 <Field label="Phone number" id="phone">
-                  <Input id="phone" type="tel" value={form.phone} onChange={update("phone")} className="h-12" />
+                  <div className="flex gap-2">
+                    <Select value={phoneCode} onValueChange={setPhoneCode}>
+                      <SelectTrigger className="w-[110px] h-12">
+                        <SelectValue placeholder="Code" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {countries.map((c) => (
+                          <SelectItem key={c.code} value={c.code}>
+                            <span className="mr-1.5">{c.flag}</span>
+                            <span>{c.code}</span>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Input
+                      id="phone"
+                      type="tel"
+                      value={form.phone}
+                      onChange={update("phone")}
+                      className="h-12 flex-1"
+                      placeholder="Phone number"
+                    />
+                  </div>
                 </Field>
                 <Field label="Address" id="address">
                   <Textarea id="address" value={form.address} onChange={update("address")} rows={3} />
@@ -154,13 +244,29 @@ function ProfilePage() {
                   />
                 </Field>
                 <Field label="Contact phone" id="ec-phone">
-                  <Input
-                    id="ec-phone"
-                    type="tel"
-                    value={form.emergency_contact_phone}
-                    onChange={update("emergency_contact_phone")}
-                    className="h-12"
-                  />
+                  <div className="flex gap-2">
+                    <Select value={ecPhoneCode} onValueChange={setEcPhoneCode}>
+                      <SelectTrigger className="w-[110px] h-12">
+                        <SelectValue placeholder="Code" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {countries.map((c) => (
+                          <SelectItem key={c.code} value={c.code}>
+                            <span className="mr-1.5">{c.flag}</span>
+                            <span>{c.code}</span>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Input
+                      id="ec-phone"
+                      type="tel"
+                      value={form.emergency_contact_phone}
+                      onChange={update("emergency_contact_phone")}
+                      className="h-12 flex-1"
+                      placeholder="Phone number"
+                    />
+                  </div>
                 </Field>
                 <Field label="Relationship" id="ec-rel">
                   <Input
