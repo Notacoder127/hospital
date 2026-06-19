@@ -273,8 +273,8 @@ function EmergencyCard() {
   }, []);
 
   const queryStr = coords
-    ? `specialist hospital diagnostic near ${coords.lat},${coords.lng}`
-    : `hospital diagnostic near ${profile?.address || patient.address}`;
+    ? `hospital near ${coords.lat},${coords.lng}`
+    : `hospital near ${profile?.address || patient.address}`;
 
   const mapsSearchUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
     queryStr,

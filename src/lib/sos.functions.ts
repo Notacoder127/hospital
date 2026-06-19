@@ -20,7 +20,7 @@ export const findNearbyHospitals = createServerFn({ method: "POST" })
         const url = new URL("https://maps.googleapis.com/maps/api/place/nearbysearch/json");
         url.searchParams.set("location", `${data.lat},${data.lng}`);
         url.searchParams.set("radius", "5000"); // 5km range
-        url.searchParams.set("keyword", "hospital|diagnostic|clinic|laboratory");
+        url.searchParams.set("keyword", "hospital");
         url.searchParams.set("key", key);
 
         const res = await fetch(url.toString());
@@ -66,9 +66,7 @@ export const findNearbyHospitals = createServerFn({ method: "POST" })
         [out:json];
         (
           node["amenity"="hospital"](around:5000, ${data.lat}, ${data.lng});
-          node["amenity"="clinic"](around:5000, ${data.lat}, ${data.lng});
           way["amenity"="hospital"](around:5000, ${data.lat}, ${data.lng});
-          way["amenity"="clinic"](around:5000, ${data.lat}, ${data.lng});
         );
         out center 15;
       `;
