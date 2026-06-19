@@ -50,11 +50,22 @@ function Dashboard() {
   const navigate = useNavigate();
   const auth = useAuth();
   const { data: profile } = useProfile(auth.user?.id);
+  const [greeting, setGreeting] = useState("Good morning");
+
   useEffect(() => {
     if (auth.loading) return;
     if (!auth.user) navigate({ to: "/auth" });
     else if (auth.role === "hospital") navigate({ to: "/hospital" });
   }, [auth, navigate]);
+
+  useEffect(() => {
+    const hour = new Date().getHours();
+    if (hour >= 12 && hour < 17) {
+      setGreeting("Good afternoon");
+    } else if (hour >= 17 || hour < 5) {
+      setGreeting("Good evening");
+    }
+  }, []);
 
   const upcoming = appointments.filter((a) => a.status !== "Completed");
   const past = appointments.filter((a) => a.status === "Completed");
@@ -67,7 +78,7 @@ function Dashboard() {
         <section className="mb-8 flex flex-col gap-2">
           <p className="text-sm font-medium text-muted-foreground">Today</p>
           <h1 className="text-3xl font-semibold text-foreground sm:text-4xl">
-            Good morning, {displayName}.
+            {greeting}, {displayName}.
           </h1>
           <p className="text-base text-muted-foreground sm:text-lg">
             You have {upcoming.length} upcoming appointment{upcoming.length === 1 ? "" : "s"}.
