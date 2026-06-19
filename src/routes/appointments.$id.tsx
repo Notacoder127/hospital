@@ -7,14 +7,18 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { AppHeader } from "@/components/app-header";
 import { appointments, formatDate, statusStyles, type Appointment } from "@/lib/mock-data";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/appointments/$id")({
   loader: ({ params }) => {
-    let appt = appointments.find((a) => a.id === params.id);
-    if (!appt && typeof window !== "undefined") {
+    let appt: Appointment | null = null;
+    if (typeof window !== "undefined") {
       const stored = localStorage.getItem("mediremind_appointments");
       const list = stored ? JSON.parse(stored) : [];
-      appt = list.find((a: any) => a.id === params.id);
+      appt = list.find((a: any) => a.id === params.id) || null;
+    }
+    if (!appt) {
+      appt = appointments.find((a) => a.id === params.id) || null;
     }
     if (!appt) {
       if (typeof window === "undefined") {
@@ -111,14 +115,41 @@ function AppointmentDetail() {
             <h1 className="text-3xl font-semibold sm:text-4xl">{appt.title}</h1>
             <p className="mt-1 text-muted-foreground">{appt.doctor}</p>
           </div>
-          <Badge
-            className={cn(
-              "rounded-full px-3 py-1 text-sm font-medium",
-              statusStyles[appt.status],
+          <div className="flex flex-col items-end gap-2">
+            <Badge
+              className={cn(
+                "rounded-full px-3 py-1 text-sm font-medium",
+                statusStyles[appt.status],
+              )}
+            >
+              {appt.status}
+            </Badge>
+            {appt.status !== "Completed" && (
+              <Button
+                size="sm"
+                onClick={() => {
+                  if (typeof window !== "undefined") {
+                    const stored = localStorage.getItem("mediremind_appointments");
+                    let list = stored ? JSON.parse(stored) : [];
+                    const index = list.findIndex((a: any) => a.id === appt.id);
+                    if (index !== -1) {
+                      list[index].status = "Completed";
+                      localStorage.setItem("mediremind_appointments", JSON.stringify(list));
+                      setLocalAppt({ ...list[index] });
+                    } else {
+                      const updated = { ...appt, status: "Completed" as const };
+                      list.unshift(updated);
+                      localStorage.setItem("mediremind_appointments", JSON.stringify(list));
+                      setLocalAppt(updated);
+                    }
+                    toast.success("Appointment marked as completed");
+                  }
+                }}
+              >
+                Mark as Completed
+              </Button>
             )}
-          >
-            {appt.status}
-          </Badge>
+          </div>
         </div>
 
         <Card className="border-border/70 shadow-[var(--shadow-soft)]">

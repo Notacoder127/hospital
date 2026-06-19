@@ -25,7 +25,10 @@ function AppointmentsPage() {
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem("mediremind_appointments");
       const local = stored ? JSON.parse(stored) : [];
-      setAllAppointments([...local, ...appointments]);
+      const filteredMocks = appointments.filter(
+        (mock) => !local.some((l: any) => l.id === mock.id)
+      );
+      setAllAppointments([...local, ...filteredMocks]);
     }
   }, []);
 

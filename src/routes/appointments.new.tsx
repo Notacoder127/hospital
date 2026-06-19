@@ -27,6 +27,7 @@ const defaultDocs = [
 function NewAppointment() {
   const navigate = useNavigate();
   const [docs, setDocs] = useState<string[]>(["Insurance card"]);
+  const [completed, setCompleted] = useState(false);
 
   const toggle = (d: string) =>
     setDocs((prev) => (prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d]));
@@ -65,7 +66,7 @@ function NewAppointment() {
                   doctor: typeInput.value || "General Practitioner",
                   date: `${dateInput.value}T${timeInput.value}:00`,
                   location: locationInput.value,
-                  status: "Upcoming" as const,
+                  status: completed ? ("Completed" as const) : ("Upcoming" as const),
                   type: typeInput.value || "Check-up",
                   documents: docs,
                 };
@@ -113,6 +114,25 @@ function NewAppointment() {
                       <span>{d}</span>
                     </label>
                   ))}
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-3 rounded-lg border border-border/60 bg-card p-4">
+                <Checkbox
+                  id="completed"
+                  checked={completed}
+                  onCheckedChange={(checked) => setCompleted(!!checked)}
+                />
+                <div className="grid gap-1 leading-none">
+                  <label
+                    htmlFor="completed"
+                    className="text-sm font-medium leading-none cursor-pointer"
+                  >
+                    Mark as Completed
+                  </label>
+                  <p className="text-xs text-muted-foreground">
+                    Check this if the appointment has already taken place.
+                  </p>
                 </div>
               </div>
 
