@@ -63,8 +63,8 @@ function ErrorView() {
 }
 
 function AppointmentDetail() {
-  const { appt } = Route.useLoaderData() as { appt: Appointment | null };
-  const [localAppt, setLocalAppt] = useState<Appointment | null>(appt);
+  const { appt: loaderAppt } = Route.useLoaderData() as { appt: Appointment | null };
+  const [localAppt, setLocalAppt] = useState<Appointment | null>(loaderAppt);
   const params = Route.useParams();
 
   useEffect(() => {
