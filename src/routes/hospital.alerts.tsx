@@ -9,7 +9,7 @@ import { emergencyAlerts, hospitalPatients } from "@/lib/hospital-data";
 import { NearestHospitalMap } from "@/components/nearest-hospital-map";
 
 export const Route = createFileRoute("/hospital/alerts")({
-  head: () => ({ meta: [{ title: "Emergency Alerts — MediRemind" }] }),
+  head: () => ({ meta: [{ title: "Emergency Alerts — Mediremm" }] }),
   component: AlertsPage,
 });
 

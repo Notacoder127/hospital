@@ -21,7 +21,7 @@ const searchSchema = z.object({ patientId: z.string().optional() });
 
 export const Route = createFileRoute("/hospital/upload")({
   validateSearch: searchSchema,
-  head: () => ({ meta: [{ title: "Upload Report — MediRemind" }] }),
+  head: () => ({ meta: [{ title: "Upload Report — Mediremm" }] }),
   component: UploadReport,
 });
 

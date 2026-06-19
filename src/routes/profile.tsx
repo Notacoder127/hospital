@@ -22,7 +22,7 @@ import {
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
-    meta: [{ title: "Profile — MediRemind" }],
+    meta: [{ title: "Profile — Mediremm" }],
   }),
   component: ProfilePage,
 });

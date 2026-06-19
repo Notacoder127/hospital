@@ -31,13 +31,13 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Dashboard — MediRemind" },
+      { title: "Dashboard — Mediremm" },
       {
         name: "description",
         content:
-          "Your MediRemind dashboard: profile summary, upcoming appointments, and one-tap Emergency SOS.",
+          "Your Mediremm dashboard: profile summary, upcoming appointments, and one-tap Emergency SOS.",
       },
-      { property: "og:title", content: "Dashboard — MediRemind" },
+      { property: "og:title", content: "Dashboard — Mediremm" },
       {
         property: "og:description",
         content: "Stay on top of appointments and reach help fast with Emergency SOS.",

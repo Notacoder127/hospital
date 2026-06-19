@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { emergencyAlerts, hospitalPatients, statusColor } from "@/lib/hospital-data";
 
 export const Route = createFileRoute("/hospital/")({
-  head: () => ({ meta: [{ title: "Hospital Dashboard — MediRemind" }] }),
+  head: () => ({ meta: [{ title: "Hospital Dashboard — Mediremm" }] }),
   component: HospitalDashboard,
 });
 

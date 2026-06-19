@@ -13,7 +13,7 @@ import { getSavedAppointments, saveAppointments } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/appointments/new")({
   head: () => ({
-    meta: [{ title: "New appointment — MediRemind" }],
+    meta: [{ title: "New appointment — Mediremm" }],
   }),
   component: NewAppointment,
 });

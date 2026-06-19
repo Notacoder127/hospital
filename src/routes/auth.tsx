@@ -124,10 +124,8 @@ function AuthPage() {
       <header className="border-b border-border bg-[var(--gradient-header)]">
         <div className="mx-auto flex h-16 max-w-6xl items-center px-4 sm:px-6 lg:px-8">
           <Link to="/auth" className="flex items-center gap-2">
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary text-primary-foreground">
-              <HeartPulse className="h-5 w-5" />
-            </span>
-            <span className="text-lg font-semibold tracking-tight">MediRemind</span>
+            <img src="/logo.png" alt="Mediremm" className="h-9 w-9 rounded-xl object-contain bg-white p-1 border border-border/40 shadow-sm" />
+            <span className="text-lg font-semibold tracking-tight">Mediremm</span>
           </Link>
         </div>
       </header>
@@ -210,7 +208,7 @@ function AuthPage() {
 
 
             <p className="mt-4 text-center text-sm text-muted-foreground">
-              {mode === "signin" ? "New to MediRemind?" : "Already have an account?"}{" "}
+              {mode === "signin" ? "New to Mediremm?" : "Already have an account?"}{" "}
               <button
                 type="button"
                 className="font-medium text-primary hover:underline"

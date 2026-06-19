@@ -37,10 +37,8 @@ export function AppHeader() {
     <header className="sticky top-0 z-30 border-b border-border bg-[var(--gradient-header)] backdrop-blur supports-[backdrop-filter]:bg-background/80">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link to="/" className="flex items-center gap-2">
-          <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary text-primary-foreground">
-            <HeartPulse className="h-5 w-5" />
-          </span>
-          <span className="text-lg font-semibold tracking-tight">MediRemind</span>
+          <img src="/logo.png" alt="Mediremm" className="h-9 w-9 rounded-xl object-contain bg-white p-1 border border-border/40 shadow-sm" />
+          <span className="text-lg font-semibold tracking-tight">Mediremm</span>
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">

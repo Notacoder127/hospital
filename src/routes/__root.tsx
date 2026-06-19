@@ -90,26 +90,26 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "MediRemind — Health Appointments & Emergency Reminders" },
+      { title: "Mediremm — Health Appointments & Emergency Reminders" },
       {
         name: "description",
         content:
-          "Never miss a health appointment. MediRemind sends SMS & call reminders and includes a one-tap Emergency SOS.",
+          "Never miss a health appointment. Mediremm sends SMS & call reminders and includes a one-tap Emergency SOS.",
       },
-      { name: "author", content: "MediRemind" },
-      { property: "og:title", content: "MediRemind — Health Appointments & Emergency Reminders" },
+      { name: "author", content: "Mediremm" },
+      { property: "og:title", content: "Mediremm — Health Appointments & Emergency Reminders" },
       {
         property: "og:description",
         content:
-          "Never miss a health appointment. MediRemind sends SMS & call reminders and includes a one-tap Emergency SOS.",
+          "Never miss a health appointment. Mediremm sends SMS & call reminders and includes a one-tap Emergency SOS.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:title", content: "MediRemind — Health Appointments & Emergency Reminders" },
+      { name: "twitter:title", content: "Mediremm — Health Appointments & Emergency Reminders" },
       {
         name: "twitter:description",
         content:
-          "Never miss a health appointment. MediRemind sends SMS & call reminders and includes a one-tap Emergency SOS.",
+          "Never miss a health appointment. Mediremm sends SMS & call reminders and includes a one-tap Emergency SOS.",
       },
       {
         property: "og:image",

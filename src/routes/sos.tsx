@@ -14,7 +14,7 @@ import { findNearbyHospitals, sendSosSms, type NearbyHospital } from "@/lib/sos.
 export const Route = createFileRoute("/sos")({
   head: () => ({
     meta: [
-      { title: "Emergency SOS — MediRemind" },
+      { title: "Emergency SOS — Mediremm" },
       {
         name: "description",
         content: "Find the nearest hospitals and alert your emergency contact instantly.",
