@@ -8,12 +8,16 @@ import { cn } from "@/lib/utils";
 import { AppHeader } from "@/components/app-header";
 import { appointments, formatDate, statusStyles, type Appointment } from "@/lib/mock-data";
 import { toast } from "sonner";
+import { useAuth } from "@/lib/auth-store";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/appointments/$id")({
-  loader: ({ params }) => {
+  loader: async ({ params }) => {
     let appt: Appointment | null = null;
     if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("mediremind_appointments");
+      const { data } = await supabase.auth.getSession();
+      const userId = data.session?.user?.id || "anonymous";
+      const stored = localStorage.getItem(`mediremind_appointments_${userId}`);
       const list = stored ? JSON.parse(stored) : [];
       appt = list.find((a: any) => a.id === params.id) || null;
     }
@@ -70,10 +74,13 @@ function AppointmentDetail() {
   const { appt: loaderAppt } = Route.useLoaderData() as { appt: Appointment | null };
   const [localAppt, setLocalAppt] = useState<Appointment | null>(loaderAppt);
   const params = Route.useParams();
+  const auth = useAuth();
 
   useEffect(() => {
+    if (auth.loading) return;
     if (!localAppt && typeof window !== "undefined") {
-      const stored = localStorage.getItem("mediremind_appointments");
+      const userId = auth.user?.id || "anonymous";
+      const stored = localStorage.getItem(`mediremind_appointments_${userId}`);
       const list = stored ? JSON.parse(stored) : [];
       const found = list.find((a: any) => a.id === params.id);
       if (found) {
@@ -83,7 +90,7 @@ function AppointmentDetail() {
         throw notFound();
       }
     }
-  }, [localAppt, params.id]);
+  }, [localAppt, params.id, auth.user?.id, auth.loading]);
 
   if (!localAppt) {
     return (
@@ -129,17 +136,19 @@ function AppointmentDetail() {
                 size="sm"
                 onClick={() => {
                   if (typeof window !== "undefined") {
-                    const stored = localStorage.getItem("mediremind_appointments");
+                    const userId = auth.user?.id || "anonymous";
+                    const key = `mediremind_appointments_${userId}`;
+                    const stored = localStorage.getItem(key);
                     let list = stored ? JSON.parse(stored) : [];
                     const index = list.findIndex((a: any) => a.id === appt.id);
                     if (index !== -1) {
                       list[index].status = "Completed";
-                      localStorage.setItem("mediremind_appointments", JSON.stringify(list));
+                      localStorage.setItem(key, JSON.stringify(list));
                       setLocalAppt({ ...list[index] });
                     } else {
                       const updated = { ...appt, status: "Completed" as const };
                       list.unshift(updated);
-                      localStorage.setItem("mediremind_appointments", JSON.stringify(list));
+                      localStorage.setItem(key, JSON.stringify(list));
                       setLocalAppt(updated);
                     }
                     toast.success("Appointment marked as completed");

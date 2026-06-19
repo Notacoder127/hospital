@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AppHeader } from "@/components/app-header";
 import { toast } from "sonner";
+import { useAuth } from "@/lib/auth-store";
 
 export const Route = createFileRoute("/appointments/new")({
   head: () => ({
@@ -28,6 +29,7 @@ function NewAppointment() {
   const navigate = useNavigate();
   const [docs, setDocs] = useState<string[]>(["Insurance card"]);
   const [completed, setCompleted] = useState(false);
+  const auth = useAuth();
 
   const toggle = (d: string) =>
     setDocs((prev) => (prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d]));
@@ -72,10 +74,12 @@ function NewAppointment() {
                 };
 
                 if (typeof window !== "undefined") {
-                  const stored = localStorage.getItem("mediremind_appointments");
+                  const userId = auth.user?.id || "anonymous";
+                  const key = `mediremind_appointments_${userId}`;
+                  const stored = localStorage.getItem(key);
                   const list = stored ? JSON.parse(stored) : [];
                   list.unshift(newAppt);
-                  localStorage.setItem("mediremind_appointments", JSON.stringify(list));
+                  localStorage.setItem(key, JSON.stringify(list));
                 }
 
                 toast.success("Appointment saved", {

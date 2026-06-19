@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { AppHeader } from "@/components/app-header";
 import { appointments, formatDate, statusStyles, type Appointment } from "@/lib/mock-data";
+import { useAuth } from "@/lib/auth-store";
 
 export const Route = createFileRoute("/appointments/")({
   head: () => ({
@@ -20,17 +21,20 @@ export const Route = createFileRoute("/appointments/")({
 
 function AppointmentsPage() {
   const [allAppointments, setAllAppointments] = useState<Appointment[]>(appointments);
+  const auth = useAuth();
 
   useEffect(() => {
+    if (auth.loading) return;
     if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("mediremind_appointments");
+      const userId = auth.user?.id || "anonymous";
+      const stored = localStorage.getItem(`mediremind_appointments_${userId}`);
       const local = stored ? JSON.parse(stored) : [];
       const filteredMocks = appointments.filter(
         (mock) => !local.some((l: any) => l.id === mock.id)
       );
       setAllAppointments([...local, ...filteredMocks]);
     }
-  }, []);
+  }, [auth.user?.id, auth.loading]);
 
   const upcoming = allAppointments.filter((a) => a.status !== "Completed");
   const past = allAppointments.filter((a) => a.status === "Completed");

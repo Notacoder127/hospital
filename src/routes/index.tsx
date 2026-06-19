@@ -69,15 +69,17 @@ function Dashboard() {
   }, []);
 
   useEffect(() => {
+    if (auth.loading) return;
     if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("mediremind_appointments");
+      const userId = auth.user?.id || "anonymous";
+      const stored = localStorage.getItem(`mediremind_appointments_${userId}`);
       const local = stored ? JSON.parse(stored) : [];
       const filteredMocks = appointments.filter(
         (mock) => !local.some((l: any) => l.id === mock.id)
       );
       setAllAppointments([...local, ...filteredMocks]);
     }
-  }, []);
+  }, [auth.user?.id, auth.loading]);
 
   const upcoming = allAppointments.filter((a) => a.status !== "Completed");
   const past = allAppointments.filter((a) => a.status === "Completed");
