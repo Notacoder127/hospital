@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { CalendarPlus, HeartPulse, LayoutDashboard, LogOut, Siren, User } from "lucide-react";
+import { Building2, CalendarPlus, HeartPulse, LayoutDashboard, LogOut, Siren, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -14,7 +14,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { patient } from "@/lib/mock-data";
-import { signOut } from "@/lib/auth-store";
+import { signOut, setRoleOverride } from "@/lib/auth-store";
+
 
 const nav = [
   { label: "Dashboard", to: "/", icon: LayoutDashboard },
@@ -46,6 +47,16 @@ export function AppHeader() {
               {item.label}
             </Link>
           ))}
+          <Button
+            variant="outline"
+            className="ml-2 h-11 border-dashed border-primary/50 text-primary hover:bg-primary/5"
+            onClick={() => {
+              setRoleOverride("hospital");
+              navigate({ to: "/hospital" });
+            }}
+          >
+            Dev: Switch to Hospital
+          </Button>
           <EmergencyDialog
             trigger={
               <Button className="ml-2 h-11 gap-2 bg-emergency text-emergency-foreground hover:bg-emergency/90">
@@ -69,6 +80,18 @@ export function AppHeader() {
         </nav>
 
         <div className="flex items-center gap-2 md:hidden">
+          <Button
+            size="icon"
+            variant="outline"
+            className="h-11 w-11 border-dashed border-primary/50 text-primary"
+            onClick={() => {
+              setRoleOverride("hospital");
+              navigate({ to: "/hospital" });
+            }}
+            aria-label="Switch to Hospital"
+          >
+            <Building2 className="h-4 w-4" />
+          </Button>
           {nav.slice(1).map((item) => (
             <Link
               key={item.label}

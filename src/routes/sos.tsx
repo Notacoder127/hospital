@@ -50,6 +50,7 @@ function SosPage() {
   const [hospitals, setHospitals] = useState<NearbyHospital[]>([]);
   const [loadingHospitals, setLoadingHospitals] = useState(false);
   const [smsSent, setSmsSent] = useState(false);
+  const [alertSaved, setAlertSaved] = useState(false);
 
   useEffect(() => {
     if (auth.loading) return;
@@ -102,6 +103,53 @@ function SosPage() {
         toast.error(`SMS failed: ${e.message}`);
       });
   }, [coords, profile, smsFn, smsSent]);
+
+  useEffect(() => {
+    if (!coords || loadingHospitals || alertSaved) return;
+    setAlertSaved(true);
+
+    const nearestHosp = hospitals[0];
+    const newAlert = {
+      id: `local-alert-${Date.now()}`,
+      patientId: auth.user?.id || "p1",
+      patientName: profile?.full_name || patient.name,
+      patientPhone: profile?.phone || patient.phone,
+      emergencyContact: {
+        name: profile?.emergency_contact_name || patient.emergencyContact.name,
+        phone: profile?.emergency_contact_phone || patient.emergencyContact.phone,
+        relationship: profile?.emergency_contact_relationship || "",
+      },
+      reportType: "Patient-triggered SOS Alert",
+      triggeredAt: new Date().toISOString(),
+      address: profile?.address || patient.address,
+      nearestHospital: {
+        name: nearestHosp?.name || "Nearest Hospital",
+        distanceKm: nearestHosp ? Number(haversineKm(coords.lat, coords.lng, nearestHosp.lat, nearestHosp.lng).toFixed(2)) : 1.2,
+        mapsUrl: nearestHosp 
+          ? `https://www.google.com/maps/dir/?api=1&destination=${nearestHosp.lat},${nearestHosp.lng}`
+          : "https://www.google.com/maps",
+      },
+      log: [
+        { timestamp: new Date().toISOString(), message: "SOS activated by patient" },
+        { timestamp: new Date().toISOString(), message: "Emergency contact notified via SMS" },
+      ]
+    };
+
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("mediremind_active_alerts");
+      const list = stored ? JSON.parse(stored) : [];
+      list.unshift(newAlert);
+      localStorage.setItem("mediremind_active_alerts", JSON.stringify(list));
+      
+      try {
+        const bc = new BroadcastChannel("mediremind_sos_channel");
+        bc.postMessage({ type: "SOS_ALERT", alert: newAlert });
+        bc.close();
+      } catch (e) {
+        console.error("BroadcastChannel error", e);
+      }
+    }
+  }, [coords, hospitals, loadingHospitals, alertSaved, profile, auth.user]);
 
   return (
     <div className="min-h-screen bg-background">

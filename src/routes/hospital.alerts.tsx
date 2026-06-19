@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
 import { MapPin, Navigation, Phone, Siren } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 import { emergencyAlerts, hospitalPatients } from "@/lib/hospital-data";
 import { NearestHospitalMap } from "@/components/nearest-hospital-map";
 
@@ -12,6 +14,58 @@ export const Route = createFileRoute("/hospital/alerts")({
 });
 
 function AlertsPage() {
+  const [alerts, setAlerts] = useState<any[]>([]);
+
+  useEffect(() => {
+    // Load initial alerts (mock data + local storage active alerts)
+    const loadAlerts = () => {
+      const stored = typeof window !== "undefined" ? localStorage.getItem("mediremind_active_alerts") : null;
+      const localAlerts = stored ? JSON.parse(stored) : [];
+      setAlerts([...localAlerts, ...emergencyAlerts]);
+    };
+
+    loadAlerts();
+
+    // Listen for new alerts in real-time
+    const bc = new BroadcastChannel("mediremind_sos_channel");
+    bc.onmessage = (event) => {
+      if (event.data && event.data.type === "SOS_ALERT") {
+        const newAlert = event.data.alert;
+        setAlerts((prev) => {
+          if (prev.some((a) => a.id === newAlert.id)) return prev;
+
+          // Play an alert sound (double-beeping)
+          try {
+            const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = "sine";
+            osc.frequency.setValueAtTime(880, audioCtx.currentTime); // A5 note
+            osc.frequency.setValueAtTime(440, audioCtx.currentTime + 0.15); // A4 note
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+          } catch (e) {
+            console.error("Audio beep error", e);
+          }
+
+          toast.error(`CRITICAL SOS: Emergency triggered by ${newAlert.patientName}!`, {
+            description: `Address: ${newAlert.address}. Diagnostic escalation details generated.`,
+            duration: 9000,
+          });
+
+          return [newAlert, ...prev];
+        });
+      }
+    };
+
+    return () => {
+      bc.close();
+    };
+  }, []);
+
   return (
     <>
       <section className="mb-8 flex items-start gap-3">
@@ -26,7 +80,7 @@ function AlertsPage() {
         </div>
       </section>
 
-      {emergencyAlerts.length === 0 ? (
+      {alerts.length === 0 ? (
         <Card className="border-border/70">
           <CardContent className="py-12 text-center text-muted-foreground">
             No active emergency alerts.
@@ -34,8 +88,9 @@ function AlertsPage() {
         </Card>
       ) : (
         <div className="space-y-6">
-          {emergencyAlerts.map((a) => {
+          {alerts.map((a) => {
             const patient = hospitalPatients.find((p) => p.id === a.patientId);
+            const hasContactInfo = patient || a.patientPhone || a.emergencyContact?.phone;
             return (
               <Card
                 key={a.id}
@@ -64,16 +119,17 @@ function AlertsPage() {
                         {a.address}
                       </p>
                     </div>
-                    {patient && (
+                    {hasContactInfo && (
                       <div className="space-y-1 rounded-lg bg-muted/50 p-3 text-sm">
                         <p className="inline-flex items-center gap-2">
                           <Phone className="h-4 w-4 text-muted-foreground" />
-                          Patient: {patient.phone}
+                          Patient: {patient?.phone || a.patientPhone || "N/A"}
                         </p>
                         <p className="inline-flex items-center gap-2">
                           <Phone className="h-4 w-4 text-muted-foreground" />
-                          Emergency contact: {patient.emergencyContact.name} ·{" "}
-                          {patient.emergencyContact.phone}
+                          Emergency contact: {patient 
+                            ? `${patient.emergencyContact.name} · ${patient.emergencyContact.phone}` 
+                            : `${a.emergencyContact?.name || "N/A"} · ${a.emergencyContact?.phone || "N/A"}`}
                         </p>
                       </div>
                     )}
@@ -114,7 +170,7 @@ function AlertsPage() {
                         Status log
                       </p>
                       <ol className="space-y-3 border-l-2 border-emergency/30 pl-4">
-                        {a.log.map((entry, i) => (
+                        {a.log.map((entry: any, i: number) => (
                           <li key={i} className="relative">
                             <span className="absolute -left-[21px] top-1.5 h-3 w-3 rounded-full bg-emergency" />
                             <p className="text-sm">{entry.message}</p>

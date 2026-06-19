@@ -18,8 +18,8 @@ export const findNearbyHospitals = createServerFn({ method: "POST" })
 
     const url = new URL("https://maps.googleapis.com/maps/api/place/nearbysearch/json");
     url.searchParams.set("location", `${data.lat},${data.lng}`);
-    url.searchParams.set("rankby", "distance");
-    url.searchParams.set("type", "hospital");
+    url.searchParams.set("radius", "5000"); // 5km range
+    url.searchParams.set("keyword", "hospital|diagnostic|clinic|laboratory");
     url.searchParams.set("key", key);
 
     const res = await fetch(url.toString());

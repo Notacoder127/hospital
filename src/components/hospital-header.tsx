@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Building2, LogOut, Siren, Upload, Users } from "lucide-react";
+import { Building2, LogOut, Siren, Upload, User, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { signOut } from "@/lib/auth-store";
+import { signOut, setRoleOverride } from "@/lib/auth-store";
 
 const nav = [
   { label: "Patients", to: "/hospital", icon: Users, exact: true },
@@ -39,6 +39,16 @@ export function HospitalHeader() {
             </Link>
           ))}
           <Button
+            variant="outline"
+            className="ml-2 h-11 border-dashed border-primary/50 text-primary hover:bg-primary/5"
+            onClick={() => {
+              setRoleOverride("patient");
+              navigate({ to: "/" });
+            }}
+          >
+            Dev: Switch to Patient
+          </Button>
+          <Button
             variant="ghost"
             className="ml-2 h-11 gap-2"
             onClick={async () => {
@@ -52,6 +62,18 @@ export function HospitalHeader() {
         </nav>
 
         <div className="flex items-center gap-1 md:hidden">
+          <Button
+            size="icon"
+            variant="outline"
+            className="h-11 w-11 border-dashed border-primary/50 text-primary"
+            onClick={() => {
+              setRoleOverride("patient");
+              navigate({ to: "/" });
+            }}
+            aria-label="Switch to Patient"
+          >
+            <User className="h-4 w-4" />
+          </Button>
           {nav.map((item) => (
             <Link
               key={item.label}

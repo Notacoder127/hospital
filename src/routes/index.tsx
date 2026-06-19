@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   Activity,
   CalendarPlus,
@@ -230,8 +230,28 @@ function ProfileCard() {
 }
 
 function EmergencyCard() {
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
+
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        },
+        () => {
+          // ignore, fallback to patient.address
+        },
+        { enableHighAccuracy: true, timeout: 10000 },
+      );
+    }
+  }, []);
+
+  const queryStr = coords
+    ? `specialist hospital diagnostic near ${coords.lat},${coords.lng}`
+    : `hospital diagnostic near ${patient.address}`;
+
   const mapsSearchUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-    `hospital near ${patient.address}`,
+    queryStr,
   )}`;
   return (
     <Card
