@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { AppHeader } from "@/components/app-header";
-import { appointments, formatDate, statusStyles, type Appointment } from "@/lib/mock-data";
+import { appointments, formatDate, statusStyles, type Appointment, getSavedAppointments } from "@/lib/mock-data";
 import { useAuth } from "@/lib/auth-store";
 
 export const Route = createFileRoute("/appointments/")({
@@ -27,8 +27,7 @@ function AppointmentsPage() {
     if (auth.loading) return;
     if (typeof window !== "undefined") {
       const userId = auth.user?.id || "anonymous";
-      const stored = localStorage.getItem(`mediremind_appointments_${userId}`);
-      const local = stored ? JSON.parse(stored) : [];
+      const local = getSavedAppointments(userId);
       const filteredMocks = appointments.filter(
         (mock) => !local.some((l: any) => l.id === mock.id)
       );

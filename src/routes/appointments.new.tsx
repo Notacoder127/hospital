@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { AppHeader } from "@/components/app-header";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth-store";
+import { getSavedAppointments, saveAppointments } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/appointments/new")({
   head: () => ({
@@ -75,11 +76,9 @@ function NewAppointment() {
 
                 if (typeof window !== "undefined") {
                   const userId = auth.user?.id || "anonymous";
-                  const key = `mediremind_appointments_${userId}`;
-                  const stored = localStorage.getItem(key);
-                  const list = stored ? JSON.parse(stored) : [];
+                  const list = getSavedAppointments(userId);
                   list.unshift(newAppt);
-                  localStorage.setItem(key, JSON.stringify(list));
+                  saveAppointments(userId, list);
                 }
 
                 toast.success("Appointment saved", {

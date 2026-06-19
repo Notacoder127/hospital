@@ -85,3 +85,29 @@ export const statusStyles: Record<Status, string> = {
   "Reminder Sent": "bg-[oklch(0.92_0.08_75)] text-[oklch(0.35_0.08_75)]",
   Completed: "bg-[oklch(0.92_0.08_155)] text-[oklch(0.35_0.1_155)]",
 };
+
+export function getSavedAppointments(userId: string): Appointment[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const key = `mediremind_appointments_${userId}`;
+    const stored = localStorage.getItem(key);
+    if (!stored) return [];
+    const parsed = JSON.parse(stored);
+    if (Array.isArray(parsed)) {
+      return parsed;
+    }
+  } catch (err) {
+    console.error("Failed to load appointments from localStorage", err);
+  }
+  return [];
+}
+
+export function saveAppointments(userId: string, list: Appointment[]) {
+  if (typeof window === "undefined") return;
+  try {
+    const key = `mediremind_appointments_${userId}`;
+    localStorage.setItem(key, JSON.stringify(list));
+  } catch (err) {
+    console.error("Failed to save appointments to localStorage", err);
+  }
+}

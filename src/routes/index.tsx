@@ -24,6 +24,7 @@ import {
   patient,
   statusStyles,
   type Appointment,
+  getSavedAppointments,
 } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/")({
@@ -72,8 +73,7 @@ function Dashboard() {
     if (auth.loading) return;
     if (typeof window !== "undefined") {
       const userId = auth.user?.id || "anonymous";
-      const stored = localStorage.getItem(`mediremind_appointments_${userId}`);
-      const local = stored ? JSON.parse(stored) : [];
+      const local = getSavedAppointments(userId);
       const filteredMocks = appointments.filter(
         (mock) => !local.some((l: any) => l.id === mock.id)
       );
