@@ -9,20 +9,29 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, type Role } from "@/lib/auth-store";
+import { z } from "zod";
+
+const authSearchSchema = z.object({
+  role: z.enum(["patient", "hospital"]).optional(),
+  mode: z.enum(["signin", "signup"]).optional(),
+});
 
 export const Route = createFileRoute("/auth")({
-  head: () => ({ meta: [{ title: "Sign in — MediRemind" }] }),
+  validateSearch: authSearchSchema,
+  head: () => ({ meta: [{ title: "Sign in — Mediremm" }] }),
   component: AuthPage,
 });
 
 function AuthPage() {
   const navigate = useNavigate();
   const auth = useAuth();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
-  const [role, setRole] = useState<Role>("patient");
+  const search = Route.useSearch();
+  const [mode, setMode] = useState<"signin" | "signup">(search.mode || "signin");
+  const [role, setRole] = useState<Role>(search.role || "patient");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [hospitalLocation, setHospitalLocation] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
 
@@ -73,6 +82,11 @@ function AuthPage() {
       return;
     }
 
+    if (mode === "signup" && role === "hospital" && !hospitalLocation.trim()) {
+      toast.error("Please enter your hospital location/address.");
+      return;
+    }
+
     setSubmitting(true);
     try {
       if (mode === "signup") {
@@ -83,11 +97,30 @@ function AuthPage() {
             emailRedirectTo: `${window.location.origin}/`,
             data: {
               full_name: name || (role === "hospital" ? "Hospital Staff" : "Patient"),
+              address: role === "hospital" ? hospitalLocation.trim() : undefined,
               role,
             },
           },
         });
         if (error) throw error;
+
+        // Perform immediate update in profiles if user is authenticated/returned
+        if (data.user) {
+          const profileUpdates: any = {
+            full_name: name || (role === "hospital" ? "Hospital Staff" : "Patient"),
+          };
+          if (role === "hospital") {
+            profileUpdates.address = hospitalLocation.trim();
+          }
+          const { error: profileError } = await supabase
+            .from("profiles")
+            .update(profileUpdates)
+            .eq("id", data.user.id);
+          if (profileError) {
+            console.error("Error updating profile location:", profileError);
+          }
+        }
+
         if (!data.session) {
           toast.success("Check your email to confirm your account, then sign in.");
           setMode("signin");
@@ -162,18 +195,35 @@ function AuthPage() {
 
             <form onSubmit={handleSubmit} className="mt-6 space-y-4">
               {mode === "signup" && (
-                <div className="space-y-1.5">
-                  <Label htmlFor="name">
-                    {role === "hospital" ? "Staff / center name" : "Full name"}
-                  </Label>
-                  <Input
-                    id="name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder={role === "hospital" ? "Dr. Anjali Rao" : "Eleanor Whitaker"}
-                    className="h-11"
-                  />
-                </div>
+                <>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="name">
+                      {role === "hospital" ? "Hospital / Diagnostic Center Name" : "Full name"}
+                    </Label>
+                    <Input
+                      id="name"
+                      required
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder={role === "hospital" ? "General Hospital / Diagnostic Labs" : "Eleanor Whitaker"}
+                      className="h-11"
+                    />
+                  </div>
+
+                  {role === "hospital" && (
+                    <div className="space-y-1.5">
+                      <Label htmlFor="location">Hospital Location / Address</Label>
+                      <Input
+                        id="location"
+                        required
+                        value={hospitalLocation}
+                        onChange={(e) => setHospitalLocation(e.target.value)}
+                        placeholder="e.g. 100 Medical Plaza, San Francisco, CA"
+                        className="h-11"
+                      />
+                    </div>
+                  )}
+                </>
               )}
               <div className="space-y-1.5">
                 <Label htmlFor="email">Email</Label>

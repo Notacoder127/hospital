@@ -39,12 +39,12 @@ export function HospitalHeader() {
           <Button
             variant="outline"
             className="ml-2 h-11 border-dashed border-primary/50 text-primary hover:bg-primary/5"
-            onClick={() => {
-              setRoleOverride("patient");
-              navigate({ to: "/" });
+            onClick={async () => {
+              await signOut();
+              navigate({ to: "/auth", search: { role: "patient", mode: "signin" } });
             }}
           >
-            Dev: Switch to Patient
+            Switch to Patient
           </Button>
           <Button
             variant="ghost"
@@ -64,9 +64,9 @@ export function HospitalHeader() {
             size="icon"
             variant="outline"
             className="h-11 w-11 border-dashed border-primary/50 text-primary"
-            onClick={() => {
-              setRoleOverride("patient");
-              navigate({ to: "/" });
+            onClick={async () => {
+              await signOut();
+              navigate({ to: "/auth", search: { role: "patient", mode: "signin" } });
             }}
             aria-label="Switch to Patient"
           >

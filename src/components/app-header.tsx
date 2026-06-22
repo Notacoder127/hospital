@@ -56,12 +56,12 @@ export function AppHeader() {
           <Button
             variant="outline"
             className="ml-2 h-11 border-dashed border-primary/50 text-primary hover:bg-primary/5"
-            onClick={() => {
-              setRoleOverride("hospital");
-              navigate({ to: "/hospital" });
+            onClick={async () => {
+              await signOut();
+              navigate({ to: "/auth", search: { role: "hospital", mode: "signup" } });
             }}
           >
-            Dev: Switch to Hospital
+            Switch to Hospital
           </Button>
           <EmergencyDialog
             trigger={
@@ -90,9 +90,9 @@ export function AppHeader() {
             size="icon"
             variant="outline"
             className="h-11 w-11 border-dashed border-primary/50 text-primary"
-            onClick={() => {
-              setRoleOverride("hospital");
-              navigate({ to: "/hospital" });
+            onClick={async () => {
+              await signOut();
+              navigate({ to: "/auth", search: { role: "hospital", mode: "signup" } });
             }}
             aria-label="Switch to Hospital"
           >
